@@ -6,14 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.example.cityexplorer.databinding.FragmentSecondBinding
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.cityexplorer.databinding.FragmentLocationBinding
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class LocationFragment : Fragment() {
 
-    private var _binding: FragmentSecondBinding? = null
+    private var _binding: FragmentLocationBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -24,7 +26,7 @@ class LocationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        _binding = FragmentLocationBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -32,9 +34,11 @@ class LocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonSaveLocation.setOnClickListener {
+        binding.buttonMainMenu.setOnClickListener {
+
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
+
     }
 
     override fun onDestroyView() {

@@ -81,7 +81,9 @@
         android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLocationsTitle">
+        app:layout_constraintTop_toBottomOf="@+id/textViewLocationsTitle"
+        android:background="#f2f2f2"
+        tools:listitem="@layout/row" >
     </androidx.recyclerview.widget.RecyclerView>
 
     <Button
