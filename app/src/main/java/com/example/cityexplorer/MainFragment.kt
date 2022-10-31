@@ -1,10 +1,12 @@
 package com.example.cityexplorer
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +23,8 @@ class MainFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private val viewModel: MainViewModel by activityViewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,14 +40,11 @@ class MainFragment : Fragment() {
 
         val recyclerview = view.findViewById<RecyclerView>(R.id.recyclerViewLocations)
         recyclerview.layoutManager = LinearLayoutManager(activity)
-        val data = ArrayList<ItemsViewModel>()
 
-        for (i in 1..20) {
-            data.add(ItemsViewModel("Name " + i, "4.5", "Address " + i))
+        viewModel.observeLocations().observe(viewLifecycleOwner) {
+            val adapter = CustomAdapter(it)
+            recyclerview.adapter = adapter
         }
-
-        val adapter = CustomAdapter(data)
-        recyclerview.adapter = adapter
 
         binding.fabAddLocation.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
