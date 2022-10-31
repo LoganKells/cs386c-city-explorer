@@ -19,7 +19,7 @@ class MainViewModel : ViewModel() {
     private val locationRepository = LocationRepository(locationApi)
 
     // Locations are observed in the MainFragment to display them in the RecyclerView.
-    private val locations = MutableLiveData<List<Location>>()
+    private val locations = MutableLiveData<List<Location>?>()
 
     /**
      * Locations will be refreshed from the local JSON file.
@@ -42,7 +42,13 @@ class MainViewModel : ViewModel() {
         this.locations.postValue(locations)
     }
 
-    fun observeLocations(): LiveData<List<Location>> {
+    fun observeLocations(): MutableLiveData<List<Location>?> {
         return locations
+    }
+
+    fun addLocation(newLocation: Location) {
+        val newLocations = locations.value?.toMutableList()
+        newLocations?.add(newLocation)
+        locations.postValue(newLocations)
     }
 }

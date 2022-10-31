@@ -39,8 +39,7 @@ class LocationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d(javaClass.simpleName, "onViewCreated")
 
-        val locations: MutableList<Location> = mutableListOf()
-
+        // TODO - there are no input validations, leading to crashes...
         binding.buttonSaveLocation.setOnClickListener {
             val formNickName = binding.editTextNickname.text.toString()
             val country = "United States"
@@ -65,24 +64,12 @@ class LocationFragment : Fragment() {
 
             // NOTE - all new Location should be added to the END of the list. The Location in the
             //  view model will be sorted based on rank when the user clicks the "Explore" button.
-            locations.add(newLocation)
+            viewModel.addLocation(newLocation)
         }
 
         binding.buttonMainMenu.setOnClickListener {
-
-            viewModel.updateLocations(locations)
-
-            viewModel.observeLocations().observe(viewLifecycleOwner) {
-                viewModel.updateLocations(locations)
-            }
-
             findNavController().navigate(R.id.action_LocationFragment_to_MainFragment)
         }
-
-//        viewModel.observeLocations().observe(viewLifecycleOwner) { newLocations ->
-//            locations = newLocations.toMutableList()
-//        }
-
     }
 
     override fun onDestroyView() {
