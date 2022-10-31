@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/row_layout"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="80dp"
     android:clickable="true"
     android:foreground="?selectableItemBackground"
     card_view:cardElevation="6dp"
@@ -18,48 +18,69 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!--
+        TODO - Only show the rowTextViewStartLocation if the start location is true.
+        -->
         <TextView
             android:id="@+id/rowTextViewStartLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
             android:text="!"
             android:textSize="24sp"
             android:textStyle="bold"
-            card_view:layout_constraintEnd_toStartOf="@+id/rowTextViewRating"
-            card_view:layout_constraintStart_toEndOf="@+id/rowTextViewName"
-            card_view:layout_constraintTop_toTopOf="parent"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintStart_toEndOf="@+id/rowCheckBoxDelete"
+            card_view:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/rowTextViewName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:layout_marginStart="16dp"
             android:text="Name"
             android:textSize="16sp"
             android:textStyle="bold"
-            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintBottom_toTopOf="@+id/rowTextViewAddress"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0.5"
+            card_view:layout_constraintStart_toEndOf="@+id/rowTextViewRating"
             card_view:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/rowTextViewRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="1"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="Rating"
-            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintStart_toEndOf="@+id/rowTextViewStartLocation"
+            card_view:layout_constraintTop_toTopOf="parent"
+            card_view:layout_constraintVertical_bias="0.521" />
+
+        <CheckBox
+            android:id="@+id/rowCheckBoxDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/rowTextViewAddress"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Address"
+            android:layout_marginStart="16dp"
+            android:text="Address1\nAddress2"
             android:textSize="16sp"
             card_view:layout_constraintBottom_toBottomOf="parent"
-            card_view:layout_constraintStart_toStartOf="parent" />
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0.5"
+            card_view:layout_constraintStart_toEndOf="@+id/rowTextViewRating"
+            card_view:layout_constraintTop_toBottomOf="@+id/rowTextViewName" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
