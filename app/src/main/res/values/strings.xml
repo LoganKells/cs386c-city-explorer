@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">City Explorer</string>
+    <string name="title_activity_main">City Explorer</string>
     <string name="title_activity_maps">City Explorer</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
