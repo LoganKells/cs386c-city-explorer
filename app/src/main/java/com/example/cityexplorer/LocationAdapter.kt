@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class CustomAdapter(private val data: ArrayList<FavLocation>) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+class LocationAdapter(private val data: ArrayList<Location>) : RecyclerView.Adapter<LocationAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var nameView: TextView = view.findViewById(R.id.rowTextViewName) as TextView

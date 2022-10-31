@@ -1,16 +1,12 @@
 package com.example.cityexplorer
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.cityexplorer.databinding.FragmentLocationBinding
 
 /**
@@ -39,10 +35,10 @@ class LocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var newFavLocationList = ArrayList<FavLocation>()
+        var newLocationList = ArrayList<Location>()
 
         viewModel.observeLocations().observe(viewLifecycleOwner) {
-            newFavLocationList = it
+            newLocationList = it
         }
 
         binding.buttonSaveLocation.setOnClickListener {
@@ -56,17 +52,17 @@ class LocationFragment : Fragment() {
 
             val formAddress = "$formAddress1, $formAddress2, $formCity, $formZipCode"
 
-            val newFavLocation = FavLocation(formName, formRating, formAddress)
+            val newLocation = Location(formName, formRating, formAddress)
 
-            newFavLocationList.add(newFavLocation)
+            newLocationList.add(newLocation)
         }
 
         binding.buttonMainMenu.setOnClickListener {
 
-            viewModel.updateLocations(newFavLocationList)
+            viewModel.updateLocations(newLocationList)
 
             viewModel.observeLocations().observe(viewLifecycleOwner) {
-                viewModel.updateLocations(newFavLocationList)
+                viewModel.updateLocations(newLocationList)
             }
 
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)

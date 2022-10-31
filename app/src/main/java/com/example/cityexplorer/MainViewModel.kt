@@ -1,18 +1,17 @@
 package com.example.cityexplorer
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
-    var getLocations = MutableLiveData<ArrayList<FavLocation>>()
+    var getLocations = MutableLiveData<ArrayList<Location>>()
 
-    fun updateLocations(data: ArrayList<FavLocation>) {
-        getLocations.postValue(data)
+    fun updateLocations(locations: ArrayList<Location>) {
+        getLocations.postValue(locations)
     }
 
-    fun observeLocations(): LiveData<ArrayList<FavLocation>> {
+    fun observeLocations(): LiveData<ArrayList<Location>> {
         return getLocations
     }
 }
