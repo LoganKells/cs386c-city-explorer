@@ -65,19 +65,18 @@ class MainFragment : Fragment() {
 
         binding.buttonDeleteSelectedLocations.setOnClickListener {
             viewModel.observeLocations().observe(viewLifecycleOwner) {
-                it?.forEachIndexed { index, location ->
-                    Log.d(javaClass.simpleName, "THATTTT$location")
+                it?.forEachIndexed { index, _ ->
                     if (it[index].flag) {
                         viewModel.removeLocation(index)
                     }
                 }
-                locationAdapter.submitList(it)
             }
+            findNavController().navigate(R.id.action_MainFragment_to_LocationFragment)
+            findNavController().navigate(R.id.action_LocationFragment_to_MainFragment)
         }
 
         binding.fabAddLocation.setOnClickListener {
             viewModel.observeLocations().observe(viewLifecycleOwner) {
-                // The submitList method will update the RecyclerView.
                 it?.forEachIndexed { _, location ->
                     location.flag = false
                 }

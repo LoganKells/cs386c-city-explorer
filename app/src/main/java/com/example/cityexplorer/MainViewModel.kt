@@ -54,13 +54,10 @@ class MainViewModel : ViewModel() {
     }
 
     fun removeLocation(locationIndex: Int) {
-        //Log.d(javaClass.simpleName, "LOC TO DEL: $locationIndex")
         val newLocations = locations.value?.toMutableList()
-        //Log.d(javaClass.simpleName, "BEFORE DELETE: $newLocations")
         if (newLocations?.get(locationIndex)?.flag == true) {
             newLocations.removeAt(locationIndex)
         }
-        //Log.d(javaClass.simpleName, "AFTER DELETE: $newLocations")
         locations.postValue(newLocations)
     }
 }

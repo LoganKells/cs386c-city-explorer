@@ -41,9 +41,7 @@ class LocationAdapter(private val viewModel: MainViewModel)
             holder.rowBinding.rowTextViewRating.text = location.rating.toString()
 
             holder.rowBinding.rowCheckBoxDelete.setOnClickListener {
-                Log.d(javaClass.simpleName, "PREV"+location.flag)
                 location.flag = location.flag != true
-                Log.d(javaClass.simpleName, "AFTER"+location.flag)
             }
         }
     }
