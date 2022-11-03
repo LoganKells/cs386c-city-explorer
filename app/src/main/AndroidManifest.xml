@@ -7,16 +7,40 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/title_activity_main"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CityExplorer"
         tools:targetApi="31">
 
+        <!--
+        Add a meta-data element to embed the version of Google Play services that the app
+        was compiled with.
+        See - https://developers.google.com/maps/documentation/android-sdk/map-with-marker#check_your_android_manifest
+        -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <!--
+        The API key for Google Maps-based APIs.
+        Add a meta-data element specifying your API key.
+        See - https://developers.google.com/maps/documentation/android-sdk/map-with-marker#check_your_android_manifest
+        -->
+
+        <activity
+            android:name=".MapsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_maps"
+            android:theme="@style/Theme.CityExplorer.NoActionBar">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="@string/title_activity_main"
             android:theme="@style/Theme.CityExplorer.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

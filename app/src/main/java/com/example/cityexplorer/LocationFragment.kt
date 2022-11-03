@@ -6,72 +6,72 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.example.cityexplorer.api.Location
 import com.example.cityexplorer.databinding.FragmentLocationBinding
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class LocationFragment : Fragment() {
+    // The viewModel should be shared with the parent activity because when a user
+    // returns to the home screen, we want to show the same Location that were previously loaded.
+    // This is why we use activityViewModels instead of viewModels.
+    private val viewModel: MainViewModel by activityViewModels()
 
     private var _binding: FragmentLocationBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
-    private val viewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
+    ): View {
         _binding = FragmentLocationBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(javaClass.simpleName, "onViewCreated")
 
-        var newFavLocationList = ArrayList<FavLocation>()
-
-        viewModel.observeLocations().observe(viewLifecycleOwner) {
-            newFavLocationList = it
-        }
-
+        // TODO - there are no input validations, leading to crashes...
         binding.buttonSaveLocation.setOnClickListener {
-            val formName = binding.editTextNickname.text.toString()
+            val formNickName = binding.editTextNickname.text.toString()
+            val country = "United States"
+            val formCity = binding.editTextCity.text.toString()
+            // TODO - get the state from the spinner
+            val formState = "CA"
             val formAddress1 = binding.editTextAddressLine1.text.toString()
             val formAddress2 = binding.editTextAddressLine2.text.toString()
-            val formCity = binding.editTextCity.text.toString()
-            val formZipCode = binding.editTextZipCode.text.toString()
-            val formRating = binding.editTextRating.text.toString()
-            val formLengthOfStay = binding.editTextDurationAtLocation.text.toString()
+            val formPostCode = binding.editTextZipCode.text.toString()
+            val latitude = 0.0
+            val longitude = 0.0
+            val formRating = binding.editTextRating.text.toString().toInt()
+            val formDuration = binding.editTextDurationAtLocation.text.toString().toInt()
+            // TODO - we said we would have comments in the proposal.
+            val formComments = ""
+            // TODO - we need to calculate rank.
+            val rank = -1
+            // Flag to help for the deletion step
+            val flag = false
 
-            val formAddress = "$formAddress1, $formAddress2, $formCity, $formZipCode"
+            val newLocation = Location(
+                formNickName, country, formState, formCity, formAddress1, formAddress2,
+                formPostCode, latitude, longitude, formRating, formDuration, formComments, rank, flag)
 
-            val newFavLocation = FavLocation(formName, formRating, formAddress)
-
-            newFavLocationList.add(newFavLocation)
+            // NOTE - all new Location should be added to the END of the list. The Location in the
+            //  view model will be sorted based on rank when the user clicks the "Explore" button.
+            viewModel.addLocation(newLocation)
         }
 
         binding.buttonMainMenu.setOnClickListener {
-
-            viewModel.updateLocations(newFavLocationList)
-
-            viewModel.observeLocations().observe(viewLifecycleOwner) {
-                viewModel.updateLocations(newFavLocationList)
-            }
-
-            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+            findNavController().navigate(R.id.action_LocationFragment_to_MainFragment)
         }
-
     }
 
     override fun onDestroyView() {
