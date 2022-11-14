@@ -14,7 +14,8 @@ data class Location(
     val duration: Int,
     val comments: String,
     val rank: Int,
-    var flag: Boolean
+    var flag: Boolean,
+    var startFlag: Boolean
     ) {
 
     override fun equals(other: Any?): Boolean {

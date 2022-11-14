@@ -33,7 +33,7 @@ class LocationAdapter(private val viewModel: MainViewModel)
         // Populate the data in the row.xml layout.
         holder.itemView.apply {
             // REVIEW - Is this what we want users to see?
-            val address = "${location.address1}, ${location.address2}, ${location.city}, ${location.state}"
+            val address = "${location.address1} ${location.address2}, ${location.city}, ${location.state} ${location.postCode}, ${location.country}"
 
             // Populate text values.
             holder.rowBinding.rowTextViewName.text = location.nickname
