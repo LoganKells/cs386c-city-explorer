@@ -51,4 +51,16 @@ class MainViewModel : ViewModel() {
         newLocations?.add(newLocation)
         locations.postValue(newLocations)
     }
+
+    // Function to remove locations where:
+    // "Flag" is true, meaning they were checked
+    // AND
+    // "Start Flag" is false, meaning they are not a starting location
+    fun removeLocation(locationIndex: Int) {
+        val newLocations = locations.value?.toMutableList()
+        if (newLocations?.get(locationIndex)?.flag == true && !newLocations[locationIndex].startFlag) {
+            newLocations.removeAt(locationIndex)
+        }
+        locations.postValue(newLocations)
+    }
 }

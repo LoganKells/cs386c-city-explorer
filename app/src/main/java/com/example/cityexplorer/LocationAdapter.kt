@@ -1,5 +1,6 @@
 package com.example.cityexplorer
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,13 +33,16 @@ class LocationAdapter(private val viewModel: MainViewModel)
         // Populate the data in the row.xml layout.
         holder.itemView.apply {
             // REVIEW - Is this what we want users to see?
-            val address = "${location.address1}, ${location.address2}, ${location.city}, ${location.state}"
+            val address = "${location.address1} ${location.address2}, ${location.city}, ${location.state} ${location.postCode}, ${location.country}"
 
             // Populate text values.
             holder.rowBinding.rowTextViewName.text = location.nickname
             holder.rowBinding.rowTextViewAddress.text = address
             holder.rowBinding.rowTextViewRating.text = location.rating.toString()
 
+            holder.rowBinding.rowCheckBoxDelete.setOnClickListener {
+                location.flag = location.flag != true
+            }
         }
     }
 
