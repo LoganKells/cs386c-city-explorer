@@ -211,6 +211,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         // submit list when done
         locations.postValue(updatedList)
+
+        // Sync JSON file to model
+        saveLocationsToJson(updatedList)
     }
 
 
