@@ -19,7 +19,10 @@ class LocationRepository(private val locationJsonApi: LocationJsonApi) {
         return allLocations
     }
 
-    fun calculateLocation(location: Location, geocoder: Geocoder): Location {
+    /**
+     * Calculate a true Address using Geocoder. Then update the Location data.
+     * */
+    fun calculateAddressUpdateLocation(location: Location, geocoder: Geocoder): Location {
 
         // Encode the location to a android.location.Address
         val addressesFromGeocoder: MutableList<Address> = geocoder.getFromLocationName(location.address1, 1)
@@ -28,9 +31,14 @@ class LocationRepository(private val locationJsonApi: LocationJsonApi) {
             // val completeAddress = addressRetrieved.getAddressLine(0)
             location.latitude = addressRetrieved.latitude
             location.longitude = addressRetrieved.longitude
-            location.address1 = (addressRetrieved.featureName ?: "") +
+            location.address1 = (addressRetrieved.subThoroughfare ?: "") +
                     " " + (addressRetrieved.thoroughfare ?: "")
-            location.address2 = addressRetrieved.subThoroughfare ?: ""
+
+            // Noticed that these field are equivalent if there is no address2 entered by user
+            // and not equal if there is an address2 entered by user such as "#302".
+            if (addressRetrieved.subThoroughfare != addressRetrieved.featureName) {
+                location.address2 = addressRetrieved.featureName ?: ""
+            }
             location.postCode = addressRetrieved.postalCode
             location.city = addressRetrieved.locality
             location.state = addressRetrieved.adminArea

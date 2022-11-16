@@ -24,7 +24,8 @@ class MainActivity : AppCompatActivity() {
 
 
     /**
-     * Initialize data in:
+     * Load the location data from the persistent JSON file into the model.
+     * Initialize data and save to:
      * - The persistent storage JSON file.
      * - Load the view model from the JSON file.
      * */
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(activityMainBinding.toolbar)
 
-        // TODO: Load the location data from the JSON file into the RecyclerView.
+        // Load the location data from the persistent JSON file into the model.
         initData()
 
         // We are using a navigation graph to manage the navigation between fragments.

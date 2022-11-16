@@ -59,11 +59,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Add a location to the view model then save it to the local JSON file.
+     * Add a location to the view model by:
+     * 1. Calculating a location Address using Geocoder.
+     * 2. Adding the location to the view model.
+     * 3. Saving the view model to the local JSON file.
      * */
     fun addLocation(location: Location, geocoder: Geocoder) {
         viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            val newLocation = locationRepository.calculateLocation(location, geocoder)
+            val newLocation = locationRepository.calculateAddressUpdateLocation(location, geocoder)
             val newLocations = locations.value?.toMutableList()
             newLocations?.add(newLocation)
 

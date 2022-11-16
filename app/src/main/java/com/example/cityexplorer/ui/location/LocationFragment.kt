@@ -79,6 +79,20 @@ class LocationFragment : Fragment() {
         return validUserDataForLocation
     }
 
+    /**
+     * Clear all the user's inputs.
+     * */
+    private fun clearForm() {
+        binding.editTextNickname.text.clear()
+        binding.editTextAddressLine1.text.clear()
+        binding.editTextAddressLine2.text.clear()
+        binding.editTextCity.text.clear()
+        binding.editTextZipCode.text.clear()
+        binding.editTextRating.text.clear()
+        binding.editTextDurationAtLocation.text.clear()
+        binding.switchCompatUserLocation.isChecked = false
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(javaClass.simpleName, "onViewCreated")
@@ -86,7 +100,7 @@ class LocationFragment : Fragment() {
         geocoder = Geocoder(context, Locale.getDefault())
 
         binding.switchCompatUserLocation.setOnClickListener {
-            // FIXME fix this so the Maps fragment is shown.
+            // TODO fix this so the Maps fragment is shown when the user clicks on a row.
             Log.d("LocationFragment onViewCreated()", "switchCompatUserLocation clicked")
         }
 
@@ -129,9 +143,11 @@ class LocationFragment : Fragment() {
                     startFlag = false
                 )
                 viewModel.addLocation(newLocationToAdd, geocoder)
+                // Clear the edit text fields.
+                clearForm()
             }
 
-            // TODO clear the edit text fields.
+
         }
 
         binding.buttonMainMenu.setOnClickListener {
