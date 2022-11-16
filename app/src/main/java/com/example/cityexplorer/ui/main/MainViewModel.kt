@@ -1,12 +1,11 @@
-package com.example.cityexplorer
+package com.example.cityexplorer.ui.main
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cityexplorer.api.Location
-import com.example.cityexplorer.api.LocationApi
-import com.example.cityexplorer.api.LocationRepository
+import com.example.cityexplorer.data.Location
+import com.example.cityexplorer.data.LocationApi
+import com.example.cityexplorer.data.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

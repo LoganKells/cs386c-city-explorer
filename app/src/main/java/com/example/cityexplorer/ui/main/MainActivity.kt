@@ -1,4 +1,4 @@
-package com.example.cityexplorer
+package com.example.cityexplorer.ui.main
 
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -7,6 +7,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.cityexplorer.R
 import com.example.cityexplorer.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

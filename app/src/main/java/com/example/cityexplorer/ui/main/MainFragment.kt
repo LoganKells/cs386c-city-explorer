@@ -1,6 +1,5 @@
-package com.example.cityexplorer
+package com.example.cityexplorer.ui.main
 
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,10 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cityexplorer.R
 import com.example.cityexplorer.databinding.FragmentMainBinding
+import com.example.cityexplorer.ui.location.LocationAdapter
 import android.location.Location as KotlinLocation
 
 /**
@@ -111,7 +111,7 @@ class MainFragment : Fragment() {
                 // Thus, we need to be careful whenever we make use of "Location".
 
                 // The final updated list. We will build it.
-                val updatedList = mutableListOf<com.example.cityexplorer.api.Location>()
+                val updatedList = mutableListOf<com.example.cityexplorer.data.Location>()
 
                 // Initialize variables
                 val curLocation = KotlinLocation("")

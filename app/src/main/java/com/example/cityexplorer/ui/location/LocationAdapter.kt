@@ -1,14 +1,12 @@
-package com.example.cityexplorer
+package com.example.cityexplorer.ui.location
 
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.cityexplorer.api.Location
+import com.example.cityexplorer.ui.main.MainViewModel
+import com.example.cityexplorer.data.Location
 import com.example.cityexplorer.databinding.RowBinding
 
 class LocationAdapter(private val viewModel: MainViewModel)

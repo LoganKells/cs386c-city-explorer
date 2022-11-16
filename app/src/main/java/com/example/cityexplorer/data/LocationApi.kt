@@ -1,4 +1,4 @@
-package com.example.cityexplorer.api
+package com.example.cityexplorer.data
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

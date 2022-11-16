@@ -1,22 +1,19 @@
-package com.example.cityexplorer
+package com.example.cityexplorer.ui.location
 
 import android.location.Geocoder
-import android.location.Location.distanceBetween
-import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.example.cityexplorer.api.Location
+import com.example.cityexplorer.ui.main.MainViewModel
+import com.example.cityexplorer.R
+import com.example.cityexplorer.data.Location
 import com.example.cityexplorer.databinding.FragmentLocationBinding
-import com.google.android.gms.common.internal.FallbackServiceBroker
-import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 /**

@@ -1,6 +1,6 @@
-package com.example.cityexplorer.api
+package com.example.cityexplorer.data
 
-import com.example.cityexplorer.MainActivity
+import com.example.cityexplorer.ui.main.MainActivity
 import com.google.gson.GsonBuilder
 
 class LocationRepository(private val locationApi: LocationApi) {

@@ -1,4 +1,4 @@
-package com.example.cityexplorer.api
+package com.example.cityexplorer.data
 
 data class Location(
     val nickname: String,
