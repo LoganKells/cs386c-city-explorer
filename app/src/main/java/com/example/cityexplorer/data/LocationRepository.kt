@@ -1,33 +1,16 @@
 package com.example.cityexplorer.data
 
-import com.example.cityexplorer.ui.main.MainActivity
+import android.location.Address
+import android.location.Geocoder
+import android.util.Log
 import com.google.gson.GsonBuilder
 
-class LocationRepository(private val locationApi: LocationApi) {
+class LocationRepository(private val locationJsonApi: LocationJsonApi) {
     val gson = GsonBuilder().registerTypeAdapter(
-        String::class.java, LocationApi.Deserializer()
+        String::class.java, LocationJsonApi.Deserializer()
     ).create()
 
-    // fun getLocations() = locationApi.getLocations()
-
-    /**
-     * This function simple gets List<Location> from the API, which loads data from a
-     * local JSON file.
-     * @return List<Location>
-     * */
-    fun getLocations(): List<Location> {
-        return if (MainActivity.readFromJson) {
-            // Read from JSON file and convert to Java Object.
-            val response = gson.fromJson(
-                MainActivity.locationFile,
-                LocationApi.LocationResponse::class.java)
-            unpackLocations(response)
-        } else {
-            emptyList()
-        }
-    }
-
-    private fun unpackLocations(response: LocationApi.LocationResponse): List<Location> {
+    fun unpackLocations(response: LocationJsonApi.LocationResponse): List<Location> {
         val locationData = response.locations
         val allLocations: MutableList<Location> = mutableListOf()
         for (location in locationData) {
@@ -36,9 +19,26 @@ class LocationRepository(private val locationApi: LocationApi) {
         return allLocations
     }
 
+    fun calculateLocation(location: Location, geocoder: Geocoder): Location {
 
-    private fun getLatitudeLongitude(location: Location) {
-        TODO("This function will get the latitude and longitude of a location by using " +
-                "the Geocode API that calls a HTTP GET request, passing an address in the URL.")
+        // Encode the location to a android.location.Address
+        val addressesFromGeocoder: MutableList<Address> = geocoder.getFromLocationName(location.address1, 1)
+        val addressRetrieved: Address? = addressesFromGeocoder[0]
+        if (addressRetrieved != null) {
+            // val completeAddress = addressRetrieved.getAddressLine(0)
+            location.latitude = addressRetrieved.latitude
+            location.longitude = addressRetrieved.longitude
+            location.address1 = (addressRetrieved.featureName ?: "") +
+                    " " + (addressRetrieved.thoroughfare ?: "")
+            location.address2 = addressRetrieved.subThoroughfare ?: ""
+            location.postCode = addressRetrieved.postalCode
+            location.city = addressRetrieved.locality
+            location.state = addressRetrieved.adminArea
+            location.country = addressRetrieved.countryCode
+        } else {
+            Log.d(javaClass.simpleName, "addLocation(): addressRetrieved is null")
+        }
+        return location
     }
+
 }

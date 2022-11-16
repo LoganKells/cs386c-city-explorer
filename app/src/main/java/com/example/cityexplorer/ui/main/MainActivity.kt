@@ -14,24 +14,38 @@ class MainActivity : AppCompatActivity() {
     companion object {
         // Location data is stored in this JSON file. You can find it in the app/src/main/assets.
         // The LocationApi.kt is used to interact with the data in this file.
-        var readFromJson = true
-        lateinit var locationFile: String
+        var readJsonInAssetsDirectory = true // Set to false when not debugging.
+        lateinit var locationFileName: String
+
     }
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var activityMainBinding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
 
+
+    /**
+     * Initialize data in:
+     * - The persistent storage JSON file.
+     * - Load the view model from the JSON file.
+     * */
     private fun initData() {
-        if (readFromJson) {
-            locationFile = assets.open("locations.json")
-                .bufferedReader().use {
-                    it.readText()
-                }
+        var jsonData = "{\"locations\":[]}"
+        if (readJsonInAssetsDirectory) {
+            // Read from assets directory, useful for debugging by pre-populating data.
+            val assetFileName = "locations.json"
+            jsonData = assets.open(assetFileName).bufferedReader().use { it.readText() }
+        }
+
+        // Write to app storage
+        //  data/data/com.example.cityexplorer/files/locationsAppStorage.json
+        locationFileName = "locationsAppStorage.json"
+        openFileOutput(locationFileName, MODE_PRIVATE).use {
+            it.write(jsonData.toByteArray())
         }
 
         // NOTE - The viewModel is a lazy load, so we must interact with the model first in
         //  MainActivity before we can use it in the other fragments.
-        viewModel.refreshLocations()
+        viewModel.refreshLocationsFromJson()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,8 +62,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
-
-
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -57,4 +69,6 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
+
+
 }

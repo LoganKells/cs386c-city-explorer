@@ -1,5 +1,6 @@
 package com.example.cityexplorer.ui.location
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -19,32 +20,42 @@ class LocationAdapter(private val viewModel: MainViewModel)
         }
     }
 
+    private lateinit var rowBinding: RowBinding
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val rowBinding = RowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        rowBinding = RowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(rowBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // Get the data for the Location row in this position
-        val location: Location = getItem(position)
+        val locationInAdapter: Location = getItem(position)
 
         // Populate the data in the row.xml layout.
         holder.itemView.apply {
             // REVIEW - Is this what we want users to see?
-            val address = "${location.address1} ${location.address2}, ${location.city}, ${location.state} ${location.postCode}, ${location.country}"
+            val address = "${locationInAdapter.address1} ${locationInAdapter.address2}, ${locationInAdapter.city}, ${locationInAdapter.state} ${locationInAdapter.postCode}, ${locationInAdapter.country}"
 
             // Populate text values.
-            holder.rowBinding.rowTextViewName.text = location.nickname
+            holder.rowBinding.rowTextViewName.text = locationInAdapter.nickname
             holder.rowBinding.rowTextViewAddress.text = address
-            holder.rowBinding.rowTextViewRating.text = location.rating.toString()
+            holder.rowBinding.rowTextViewRating.text = locationInAdapter.rating.toString()
 
-            holder.rowBinding.rowCheckBoxDelete.setOnClickListener {
-                location.flag = location.flag != true
+            // Ensure the checkbox is set to the correct value.
+            holder.rowBinding.rowCheckBoxDelete.isChecked = locationInAdapter.deleteFlag
+
+            // Update the deleteFlag in the Location object when the checkbox is clicked in the
+            // view model.
+            holder.rowBinding.rowCheckBoxDelete.setOnCheckedChangeListener { _, isChecked: Boolean ->
+                locationInAdapter.deleteFlag = isChecked
+
+                // It's critical to update the model to reflect the user's changes.
+                viewModel.updateLocation(locationInAdapter, position)
+                Log.d("LocationAdapter", "onBindViewHolder: isChecked = $isChecked")
             }
         }
     }
 
-    // FIXME - Why can we have multiple locations with the same values?
     class LocationDiffCallback : DiffUtil.ItemCallback<Location>() {
         override fun areItemsTheSame(oldItem: Location, newItem: Location): Boolean {
             return oldItem == newItem

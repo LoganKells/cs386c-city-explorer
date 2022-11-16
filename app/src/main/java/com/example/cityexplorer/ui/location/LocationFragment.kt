@@ -41,112 +41,97 @@ class LocationFragment : Fragment() {
         return binding.root
     }
 
+    private fun validateUserInput(
+        addressFormatted: String,
+        formRating: String,
+        formDuration: String): Boolean {
+        // Location data must be valid before saving.
+        var validUserDataForLocation = true
+
+        // Discard non-valid address
+        if (addressFormatted.length <= 5) {
+            Toast.makeText(context, "Please provide an address!", Toast.LENGTH_SHORT).show()
+            Log.d("LocationFragment validateUserInput()", "Address is too short: $addressFormatted")
+            validUserDataForLocation = false
+        } else {
+            // Try to get the geocoded address using Google.
+            val addressFromGeocoder = geocoder.getFromLocationName(addressFormatted, 1)
+            if (addressFromGeocoder == null || addressFromGeocoder.isEmpty()) {
+                Log.d("LocationFragment validateUserInput()",
+                    "addressFormatted is not valid for geocoder: $addressFormatted")
+                Toast.makeText(context, "The address does not exist!", Toast.LENGTH_SHORT).show()
+                validUserDataForLocation = false
+            }
+        }
+        // Must insert rating or ".toInt()" crashes the app
+        if (formRating.isEmpty()) {
+            Log.d("LocationFragment validateUserInput()", "formRating is empty")
+            Toast.makeText(context, "Please provide a valid rating!", Toast.LENGTH_SHORT).show()
+            validUserDataForLocation = false
+        }
+        // Must insert duration or ".toInt()" crashes the app
+        if (formDuration.isEmpty()) {
+            Log.d("LocationFragment validateUserInput()", "formDuration is empty")
+            Toast.makeText(context, "Please provide a valid duration!", Toast.LENGTH_SHORT).show()
+            validUserDataForLocation = false
+        }
+
+        return validUserDataForLocation
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(javaClass.simpleName, "onViewCreated")
 
         geocoder = Geocoder(context, Locale.getDefault())
 
-        var tmp = false
-
         binding.switchCompatUserLocation.setOnClickListener {
-            tmp = tmp != true
+            // FIXME fix this so the Maps fragment is shown.
+            Log.d("LocationFragment onViewCreated()", "switchCompatUserLocation clicked")
         }
 
-        // TODO - there are no input validations, leading to crashes...
         binding.buttonSaveLocation.setOnClickListener {
             val formNickName = binding.editTextNickname.text.toString()
             val country = "United States"
             val formCity = binding.editTextCity.text.toString()
-            // TODO - get the state from the spinner
+            // TODO - get the state from the spinner, which is not in the UI yet.
             val formState = "CA"
             val formAddress1 = binding.editTextAddressLine1.text.toString()
             val formAddress2 = binding.editTextAddressLine2.text.toString()
             val formPostCode = binding.editTextZipCode.text.toString()
             val formRating = binding.editTextRating.text.toString()
             val formDuration = binding.editTextDurationAtLocation.text.toString()
-            // TODO - we said we would have comments in the proposal.
+            // TODO - Add comments field to UI. we said we would have comments in the proposal.
             val formComments = ""
-            // TODO - we need to calculate rank.
-            val rank = -1
-            // Flag to help for the deletion step
-            val flag = false
-            // Flag to identify starting location
-            val startFlag = tmp
 
-            val address = "$formAddress1 $formAddress2, $formCity, $formPostCode"
+            // Validate user input as an address with rating and duration.
+            val addressFormatted = "$formAddress1 $formAddress2, $formCity, $formPostCode"
+            val validUserDataForLocation: Boolean =
+                validateUserInput(addressFormatted, formRating, formDuration)
 
-            // Discard non-valid address
-            if (address.length <= 5) {
-                Toast.makeText(context, "Please provide an address!", Toast.LENGTH_SHORT).show()
+            // Only save the location if all the data is validated.
+            if (validUserDataForLocation) {
+                val newLocationToAdd = Location(
+                    nickname = formNickName,
+                    country = "",
+                    state = "",
+                    city = "",
+                    address1 = addressFormatted,
+                    address2 = "",
+                    postCode = "",
+                    latitude = 0.0,
+                    longitude = 0.0,
+                    rating = formRating.toInt(),
+                    duration = formDuration.toInt(),
+                    comments = formComments,
+                    rank = -1,
+                    deleteFlag = false,
+                    startFlag = false
+                )
+                viewModel.addLocation(newLocationToAdd, geocoder)
             }
-            // Must insert rating or ".toInt()" crashes the app
-            else if (formRating.isEmpty()) {
-                Toast.makeText(context, "Please provide a valid rating!", Toast.LENGTH_SHORT).show()
-            }
-            // Must insert duration or ".toInt()" crashes the app
-            else if (formDuration.isEmpty()) {
-                Toast.makeText(context, "Please provide a valid duration!", Toast.LENGTH_SHORT).show()
-            }
-            else {
-                val newAddress = geocoder.getFromLocationName(address, 1)
-                if(newAddress.isEmpty()){
-                    Toast.makeText(context, "The address does not exist!", Toast.LENGTH_SHORT).show()
-                }
-                else {
-                    // Instead of user input, we use standardized input from geolocation API.
-                    // Perhaps we should directly use "completeAddress", but then we need to change the adapter.
-                    // And we will also have to change the Location data class accordingly.
-                    val newLocation = newAddress[0]
-                    val completeAddress = newLocation.getAddressLine(0)
-                    val latitude = newLocation.latitude
-                    val longitude = newLocation.longitude
-                    val locAddress = newLocation.featureName + " " + newLocation.thoroughfare
-                    val locPostCode = newLocation.postalCode
-                    val locCity = newLocation.locality
-                    val locState = newLocation.adminArea
-                    val locCountry = newLocation.countryCode
 
-                    // Checking for duplicates based on lat/long coordinates.
-                    var foundDuplicate = false
-                    viewModel.observeLocations().observe(viewLifecycleOwner) {
-                        it?.forEachIndexed { index, _ ->
-                            if (it[index].latitude == latitude && it[index].longitude == longitude) {
-                                foundDuplicate = true
-                            }
-                        }
-                    }
-
-                    // We only add the location if it doesn't already exist in the list
-                    if (!foundDuplicate) {
-
-                        // We could potentially move this piece of code on Main Fragment
-                        // It only keeps the last (as per list index) declared starting location.
-                        var foundStart = false
-                        if (tmp) {
-                            viewModel.observeLocations().observe(viewLifecycleOwner) {
-                                it?.asReversed()?.forEachIndexed { index, _ ->
-                                    if (foundStart) {
-                                        it[index].startFlag = false
-                                    }
-
-                                    if (it[index].startFlag) {
-                                        foundStart = true
-                                    }
-                                }
-                            }
-                        }
-
-                        val newLocationToAdd = Location(
-                            formNickName, locCountry, locState, locCity, locAddress, "",
-                            locPostCode, latitude, longitude, formRating.toInt(), formDuration.toInt(), formComments, rank, flag, startFlag)
-
-                        // NOTE - all new Location should be added to the END of the list. The Location in the
-                        //  view model will be sorted based on rank when the user clicks the "Explore" button.
-                        viewModel.addLocation(newLocationToAdd)
-                    }
-                }
-            }
+            // TODO clear the edit text fields.
         }
 
         binding.buttonMainMenu.setOnClickListener {
