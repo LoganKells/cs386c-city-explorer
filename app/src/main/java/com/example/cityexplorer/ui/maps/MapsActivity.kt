@@ -1,7 +1,8 @@
-package com.example.cityexplorer
+package com.example.cityexplorer.ui.maps
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.cityexplorer.R
 import com.example.cityexplorer.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback

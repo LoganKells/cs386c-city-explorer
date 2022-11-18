@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainFragment">
+    tools:context=".ui.main.MainFragment">
 
     <TextView
         android:id="@+id/textView8"
@@ -98,7 +98,7 @@
         app:srcCompat="@android:drawable/ic_input_add" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fabOptimize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
