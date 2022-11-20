@@ -105,6 +105,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Export the Model List<Location> to a new JSON file, given a Uri of the new file.
+     * The Uri is created using the Storage Access Framework.
      * @param uri The Uri of the JSON file to write Location data to.
      * */
     fun exportToJson(uri: Uri) {
@@ -129,10 +131,39 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 it?.write(jsonData.toByteArray())
                 Log.d("MainViewModel", "Saved locations to JSON file. ${locationsData.size} locations.")
             }
-
         }
-
     }
+
+    fun importFromJson(uri: Uri) {
+        viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            val app = getApplication<Application>()
+
+            // Read the JSON string from the JSON file in shared storage.
+            val jsonData: String = app.contentResolver.openInputStream(uri)?.bufferedReader().use {
+                it?.readText()
+                    ?: ""
+            }
+
+            // Convert the JSON string to a List<Location> and update the view model.
+            if (jsonData.isEmpty()) {
+                Log.d("MainViewModel", "No data to import.")
+            } else {
+                // Convert the JSON string to a List<Location>.
+                val response = locationRepository.gson.fromJson(
+                    jsonData,
+                    LocationJsonApi.LocationResponse::class.java
+                )
+                val newLocations = locationRepository.unpackLocations(response)
+
+                // Update the locations in the view model.
+                locations.postValue(newLocations)
+
+                // Sync JSON file with the view model.
+                saveLocationsToJson(newLocations)
+            }
+        }
+    }
+
 
     /**
      * Function to remove locations selected by the user in the RecyclerView.
