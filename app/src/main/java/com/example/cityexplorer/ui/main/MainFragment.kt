@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
@@ -80,6 +81,9 @@ class MainFragment : Fragment() {
                     viewModel.importFromJson(uri)
                 }
                 Log.d("MainFragment", "Created ActivityResultLauncher for opening JSON file.")
+            } else {
+                Log.d("MainFragment", "Failed to open JSON file.")
+                Toast.makeText(context, "Failed to open JSON file.", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -133,6 +137,8 @@ class MainFragment : Fragment() {
 
         // This button will import the data from a JSON file.
         binding.buttonImportFromJson.setOnClickListener {
+            // Launch the intent to open the file to import data.
+            // See: https://developer.android.com/training/data-storage/shared/documents-files#open-file
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/json"

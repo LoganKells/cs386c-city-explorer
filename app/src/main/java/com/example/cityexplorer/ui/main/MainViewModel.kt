@@ -1,12 +1,10 @@
 package com.example.cityexplorer.ui.main
 
 import android.app.Application
-import android.content.Intent
 import android.location.Geocoder
 import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -15,6 +13,7 @@ import com.example.cityexplorer.data.LocationJsonApi
 import com.example.cityexplorer.data.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.InputStream
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     // The title value is observed to update the action bar title.
@@ -27,13 +26,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Locations are observed in the MainFragment to display them in the RecyclerView.
     private val locations = MutableLiveData<List<Location>?>()
 
-
-
     // ************** Action Bar ************************
     fun setTitle(newTitle: String) {
         title.value = newTitle
     }
-
 
     // ************** Locations ************************
     fun observeLocations(): MutableLiveData<List<Location>?> {
@@ -139,27 +135,42 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val app = getApplication<Application>()
 
             // Read the JSON string from the JSON file in shared storage.
-            val jsonData: String = app.contentResolver.openInputStream(uri)?.bufferedReader().use {
-                it?.readText()
-                    ?: ""
+            var inputStream: InputStream? = null
+            var jsonData: String? = null
+            try {
+                inputStream = app.contentResolver.openInputStream(uri)!!
+                jsonData = inputStream.bufferedReader().use {
+                    it.readText()
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error reading JSON file: ${e.message}")
+            } finally {
+                inputStream?.close()
             }
 
             // Convert the JSON string to a List<Location> and update the view model.
-            if (jsonData.isEmpty()) {
-                Log.d("MainViewModel", "No data to import.")
-            } else {
-                // Convert the JSON string to a List<Location>.
-                val response = locationRepository.gson.fromJson(
-                    jsonData,
-                    LocationJsonApi.LocationResponse::class.java
-                )
-                val newLocations = locationRepository.unpackLocations(response)
+            if (jsonData != null) {
+                if (jsonData.isEmpty()) {
+                    Log.d("MainViewModel", "importFromJson(). No data to import.")
+                } else {
+                    // Convert the JSON string to a List<Location>.
+                    val response = locationRepository.gson.fromJson(
+                        jsonData,
+                        LocationJsonApi.LocationResponse::class.java
+                    )
+                    try {
+                        val newLocations = locationRepository.unpackLocations(response)
 
-                // Update the locations in the view model.
-                locations.postValue(newLocations)
+                        // Update the locations in the view model.
+                        locations.postValue(newLocations)
 
-                // Sync JSON file with the view model.
-                saveLocationsToJson(newLocations)
+                        // Sync JSON file to view model.
+                        saveLocationsToJson(newLocations)
+                    } catch (e: Exception) {
+                        Log.e("MainViewModel",
+                            "importFromJson(). Error unpacking Location from JSON file.")
+                    }
+                }
             }
         }
     }
@@ -208,6 +219,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         //  until the user adds or deletes a Location.
         // saveLocationsToJson(locationsData!!)
     }
+
+    // ************** Location Optimization ************************
 
     /**
      * The "Algorithm" for optimizing the sorting of the locations
