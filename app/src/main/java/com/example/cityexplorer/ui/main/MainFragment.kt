@@ -1,11 +1,16 @@
 package com.example.cityexplorer.ui.main
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +35,8 @@ class MainFragment : Fragment() {
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
+    private lateinit var saveFileLauncher: ActivityResultLauncher<Intent>
+
     /**
      * Set up the RecyclerView post data Adapter.
      * */
@@ -50,8 +57,20 @@ class MainFragment : Fragment() {
     ): View {
 
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-        return binding.root
 
+        // This launcher is used to save the data to a file when the user clicks the export
+        // to JSON button.
+        saveFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                    it.data?.data?.also { uri ->
+                        // Write data from the model to the new JSON file.
+                        viewModel.exportToJson(uri)
+                    }
+                Log.d("MainFragment", "Created ActivityResultLauncher for saving JSON file.")
+            }
+        }
+
+        return binding.root
     }
 
     private fun initObservers() {
@@ -85,6 +104,17 @@ class MainFragment : Fragment() {
         //
         binding.fabOptimize.setOnClickListener {
             viewModel.calculateOrderOfLocations()
+        }
+
+        binding.buttonExportToJson.setOnClickListener {
+            // Launch the intent to save the file.
+            // See: https://developer.android.com/training/data-storage/shared/documents-files#open-file
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_TITLE, "city_explorer_locations.json")
+            }
+            saveFileLauncher.launch(intent)
         }
     }
 

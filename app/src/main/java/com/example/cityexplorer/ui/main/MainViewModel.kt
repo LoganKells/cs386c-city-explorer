@@ -1,9 +1,12 @@
 package com.example.cityexplorer.ui.main
 
 import android.app.Application
+import android.content.Intent
 import android.location.Geocoder
+import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -23,6 +26,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     // Locations are observed in the MainFragment to display them in the RecyclerView.
     private val locations = MutableLiveData<List<Location>?>()
+
 
 
     // ************** Action Bar ************************
@@ -83,9 +87,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * */
     private fun saveLocationsToJson(locations: List<Location>) {
         viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            val app = getApplication<Application>()
+            // Convert the List<Location> to a JSON string.
             val locationResponse = LocationJsonApi.LocationResponse(locations)
             val jsonData: String = LocationJsonApi.convertToJson(locationResponse)
+
+            // Write the JSON string to the JSON file in the app storage.
+            val app = getApplication<Application>()
             app.applicationContext.openFileOutput(MainActivity.locationFileName, AppCompatActivity.MODE_PRIVATE)
                 .use {
                     it.write(jsonData.toByteArray())
@@ -95,6 +102,36 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             // Sync the locations in the view model with the JSON file.
             refreshLocationsFromJson()
         }
+    }
+
+    /**
+     * @param uri The Uri of the JSON file to write Location data to.
+     * */
+    fun exportToJson(uri: Uri) {
+        val locationsData: MutableList<Location>? = getLocations() as MutableList<Location>?
+
+        // Sync the locations in the view model with the JSON file.
+        if (locationsData != null) {
+            saveLocationsToJson(locationsData)
+        }
+
+        // Use Storage Access Framework to save the JSON file to the user's device.
+        // See: https://developer.android.com/training/data-storage/shared/documents-files
+        viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            val app = getApplication<Application>()
+
+            // Convert the List<Location> to a JSON string.
+            val locationResponse = LocationJsonApi.LocationResponse(locationsData!!)
+            val jsonData: String = LocationJsonApi.convertToJson(locationResponse)
+
+            // Write the JSON string to a new JSON file in shared storage.
+            app.contentResolver.openOutputStream(uri).use {
+                it?.write(jsonData.toByteArray())
+                Log.d("MainViewModel", "Saved locations to JSON file. ${locationsData.size} locations.")
+            }
+
+        }
+
     }
 
     /**
