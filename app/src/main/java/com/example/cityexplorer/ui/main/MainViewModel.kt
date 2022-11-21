@@ -2,6 +2,7 @@ package com.example.cityexplorer.ui.main
 
 import android.app.Application
 import android.location.Geocoder
+import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.AndroidViewModel
@@ -12,6 +13,7 @@ import com.example.cityexplorer.data.LocationJsonApi
 import com.example.cityexplorer.data.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.InputStream
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     // The title value is observed to update the action bar title.
@@ -24,12 +26,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Locations are observed in the MainFragment to display them in the RecyclerView.
     private val locations = MutableLiveData<List<Location>?>()
 
-
     // ************** Action Bar ************************
     fun setTitle(newTitle: String) {
         title.value = newTitle
     }
-
 
     // ************** Locations ************************
     fun observeLocations(): MutableLiveData<List<Location>?> {
@@ -83,9 +83,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * */
     private fun saveLocationsToJson(locations: List<Location>) {
         viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            val app = getApplication<Application>()
+            // Convert the List<Location> to a JSON string.
             val locationResponse = LocationJsonApi.LocationResponse(locations)
             val jsonData: String = LocationJsonApi.convertToJson(locationResponse)
+
+            // Write the JSON string to the JSON file in the app storage.
+            val app = getApplication<Application>()
             app.applicationContext.openFileOutput(MainActivity.locationFileName, AppCompatActivity.MODE_PRIVATE)
                 .use {
                     it.write(jsonData.toByteArray())
@@ -96,6 +99,82 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshLocationsFromJson()
         }
     }
+
+    /**
+     * Export the Model List<Location> to a new JSON file, given a Uri of the new file.
+     * The Uri is created using the Storage Access Framework.
+     * @param uri The Uri of the JSON file to write Location data to.
+     * */
+    fun exportToJson(uri: Uri) {
+        val locationsData: MutableList<Location>? = getLocations() as MutableList<Location>?
+
+        // Sync the locations in the view model with the JSON file.
+        if (locationsData != null) {
+            saveLocationsToJson(locationsData)
+        }
+
+        // Use Storage Access Framework to save the JSON file to the user's device.
+        // See: https://developer.android.com/training/data-storage/shared/documents-files
+        viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            val app = getApplication<Application>()
+
+            // Convert the List<Location> to a JSON string.
+            val locationResponse = LocationJsonApi.LocationResponse(locationsData!!)
+            val jsonData: String = LocationJsonApi.convertToJson(locationResponse)
+
+            // Write the JSON string to a new JSON file in shared storage.
+            app.contentResolver.openOutputStream(uri).use {
+                it?.write(jsonData.toByteArray())
+                Log.d("MainViewModel", "Saved locations to JSON file. ${locationsData.size} locations.")
+            }
+        }
+    }
+
+    fun importFromJson(uri: Uri) {
+        viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            val app = getApplication<Application>()
+
+            // Read the JSON string from the JSON file in shared storage.
+            var inputStream: InputStream? = null
+            var jsonData: String? = null
+            try {
+                inputStream = app.contentResolver.openInputStream(uri)!!
+                jsonData = inputStream.bufferedReader().use {
+                    it.readText()
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error reading JSON file: ${e.message}")
+            } finally {
+                inputStream?.close()
+            }
+
+            // Convert the JSON string to a List<Location> and update the view model.
+            if (jsonData != null) {
+                if (jsonData.isEmpty()) {
+                    Log.d("MainViewModel", "importFromJson(). No data to import.")
+                } else {
+                    // Convert the JSON string to a List<Location>.
+                    val response = locationRepository.gson.fromJson(
+                        jsonData,
+                        LocationJsonApi.LocationResponse::class.java
+                    )
+                    try {
+                        val newLocations = locationRepository.unpackLocations(response)
+
+                        // Update the locations in the view model.
+                        locations.postValue(newLocations)
+
+                        // Sync JSON file to view model.
+                        saveLocationsToJson(newLocations)
+                    } catch (e: Exception) {
+                        Log.e("MainViewModel",
+                            "importFromJson(). Error unpacking Location from JSON file.")
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Function to remove locations selected by the user in the RecyclerView.
@@ -140,6 +219,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         //  until the user adds or deletes a Location.
         // saveLocationsToJson(locationsData!!)
     }
+
+    // ************** Location Optimization ************************
 
     /**
      * The "Algorithm" for optimizing the sorting of the locations

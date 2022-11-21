@@ -1,11 +1,16 @@
 package com.example.cityexplorer.ui.main
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +35,11 @@ class MainFragment : Fragment() {
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
+    // Launchers are used to start the Storage Access Framework activities.
+    // See: https://developer.android.com/training/data-storage/shared/documents-files
+    private lateinit var saveJsonFileLauncher: ActivityResultLauncher<Intent>
+    private lateinit var importJsonFileLauncher: ActivityResultLauncher<Intent>
+
     /**
      * Set up the RecyclerView post data Adapter.
      * */
@@ -50,8 +60,34 @@ class MainFragment : Fragment() {
     ): View {
 
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-        return binding.root
 
+        // This launcher is used to save the data to a file when the user clicks the export
+        // to JSON button.
+        saveJsonFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                    it.data?.data?.also { uri ->
+                        // Write data from the model to the new JSON file.
+                        viewModel.exportToJson(uri)
+                    }
+                Log.d("MainFragment", "Created ActivityResultLauncher for saving JSON file.")
+            }
+        }
+
+        // This launcher is used to open a file when the user clicks the import from JSON button.
+        importJsonFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                it.data?.data?.also { uri ->
+                    // Read data from the JSON file and update the model.
+                    viewModel.importFromJson(uri)
+                }
+                Log.d("MainFragment", "Created ActivityResultLauncher for opening JSON file.")
+            } else {
+                Log.d("MainFragment", "Failed to open JSON file.")
+                Toast.makeText(context, "Failed to open JSON file.", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        return binding.root
     }
 
     private fun initObservers() {
@@ -82,10 +118,34 @@ class MainFragment : Fragment() {
             findNavController().navigate(R.id.action_MainFragment_to_LocationFragment)
         }
 
-        //
+        // This button will optimize the sort of the List<Location> in the model.
         binding.fabOptimize.setOnClickListener {
             viewModel.calculateOrderOfLocations()
         }
+
+        // This button will export the data to a JSON file.
+        binding.buttonExportToJson.setOnClickListener {
+            // Launch the intent to save the file.
+            // See: https://developer.android.com/training/data-storage/shared/documents-files#open-file
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_TITLE, "city_explorer_locations.json")
+            }
+            saveJsonFileLauncher.launch(intent)
+        }
+
+        // This button will import the data from a JSON file.
+        binding.buttonImportFromJson.setOnClickListener {
+            // Launch the intent to open the file to import data.
+            // See: https://developer.android.com/training/data-storage/shared/documents-files#open-file
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+            }
+            importJsonFileLauncher.launch(intent)
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
