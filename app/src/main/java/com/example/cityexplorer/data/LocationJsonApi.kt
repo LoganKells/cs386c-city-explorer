@@ -1,5 +1,6 @@
-package com.example.cityexplorer.api
+package com.example.cityexplorer.data
 
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -9,9 +10,13 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.lang.reflect.Type
 
-interface LocationApi {
+/**
+ * This interface reads a JSON file (String) and converts it to a List<Location>.
+ * */
+interface LocationJsonApi {
     companion object {
-        fun create(): LocationApi {
+        fun create(): LocationJsonApi {
+            // TODO - remove the HTTP retrofit because we do not use this.
             return createWithUrl(httpurl)
         }
 
@@ -27,7 +32,7 @@ interface LocationApi {
          * @param httpUrl is the base URL for the API to get the Latitude and Longitude
          *  for a Location.
          * */
-        private fun createWithUrl(httpUrl: HttpUrl): LocationApi {
+        private fun createWithUrl(httpUrl: HttpUrl): LocationJsonApi {
             val client = OkHttpClient.Builder()
                 .addInterceptor(
                     HttpLoggingInterceptor().apply {
@@ -40,7 +45,16 @@ interface LocationApi {
                 .baseUrl(httpUrl)
                 .client(client)
                 .build()
-                .create(LocationApi::class.java)
+                .create(LocationJsonApi::class.java)
+        }
+
+        fun convertToJson(locationResponse: LocationResponse): String {
+            val gson = GsonBuilder()
+                .registerTypeAdapter(LocationResponse::class.java, Deserializer())
+                .create()
+            val json: String = gson.toJson(locationResponse)
+            // Log.d("LocationJsonApi", "writeToJson: $json")
+            return json
         }
     }
 
@@ -59,5 +73,4 @@ interface LocationApi {
      * This class is used to deserialize the JSON response from the API.
      * */
     class LocationResponse(val locations: List<Location>)
-
 }

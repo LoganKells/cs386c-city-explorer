@@ -1,20 +1,20 @@
-package com.example.cityexplorer.api
+package com.example.cityexplorer.data
 
 data class Location(
     val nickname: String,
-    val country: String,
-    val state: String,
-    val city: String,
-    val address1: String,
-    val address2: String,
-    val postCode: String,
-    val latitude: Double,
-    val longitude: Double,
-    val rating: Int,
+    var country: String,
+    var state: String,
+    var city: String,
+    var address1: String,
+    var address2: String,
+    var postCode: String,
+    var latitude: Double,
+    var longitude: Double,
+    var rating: Int,
     val duration: Int,
     val comments: String,
     val rank: Int,
-    var flag: Boolean,
+    var deleteFlag: Boolean,
     var startFlag: Boolean
     ) {
 
