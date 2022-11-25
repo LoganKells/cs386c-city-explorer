@@ -64,10 +64,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * 2. Adding the location to the view model.
      * 3. Saving the view model to the local JSON file.
      * */
-    fun addLocation(location: Location, geocoder: Geocoder) {
+    fun addLocation(location: Location, geocoder: Geocoder, startLocFlag: Boolean) {
         viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
             val newLocation = locationRepository.calculateAddressUpdateLocation(location, geocoder)
             val newLocations = locations.value?.toMutableList()
+
+            // Overwrite starting location if the starting location box was checked
+            if (startLocFlag) {
+                if (newLocations != null) {
+                    for ((index, location) in newLocations.withIndex()) {
+                        newLocations[index].startFlag = false
+                    }
+                }
+            }
+
             newLocations?.add(newLocation)
 
             // Update model
@@ -240,15 +250,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         // Initialize variables
         val curLocation = android.location.Location("")
         val nextLocation = android.location.Location("")
-        var curToNextDistance: Float
+        var curToNext: Float
 
         // Find starting location and get coordinates
+        var foundStartingLoc = false
         if (locationsData != null) {
-            for (location in locationsData) {
-                if (location.startFlag) {
-                    curLocation.latitude = location.latitude
-                    curLocation.longitude = location.longitude
+            for ((index, location) in locationsData.withIndex()) {
+                if (locationsData[index].startFlag) {
+                    curLocation.latitude = locationsData[index].latitude
+                    curLocation.longitude = locationsData[index].longitude
+                    updatedList.add(locationsData[index])
+                    foundStartingLoc = true
                 }
+            }
+
+            if (!foundStartingLoc) {
+                curLocation.latitude = locationsData[0].latitude
+                curLocation.longitude = locationsData[0].longitude
+                updatedList.add(locationsData[0])
             }
         }
 
@@ -256,38 +275,39 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         while (updatedList.size < locationsData?.size!!) {
 
             // initialize variables
-            var minCurToNextDistance = 100000000000000F
+            var minCurToNext = 100000000000000F
             var targetIndex = -1
 
             // parse the entire list of locations
             for ((index, location) in locationsData.withIndex()) {
                 // check to skip the current location, as it cannot be the next one
-                if (location.latitude != curLocation.latitude && location.longitude != curLocation.longitude) {
+                // if (location.latitude != curLocation.latitude && location.longitude != curLocation.longitude) {
+                if (!updatedList.contains(locationsData[index])) {
 
                     // get coordinates of the candidate next location
-                    nextLocation.latitude = location.latitude
-                    nextLocation.longitude = location.longitude
+                    nextLocation.latitude = locationsData[index].latitude
+                    nextLocation.longitude = locationsData[index].longitude
 
-                    // calculate distance between current location and candidate next location
-                    curToNextDistance = curLocation.distanceTo(nextLocation)
+                    // calculate distance/rating metric between current location and candidate next location
+                    curToNext = (curLocation.distanceTo(nextLocation) * (1 - 0.1 * locationsData[index].rating)).toFloat()
 
-                    // keep the location index that achieves the minimum distance
-                    if (curToNextDistance < minCurToNextDistance) {
-                        minCurToNextDistance = curToNextDistance
+                    // keep the location index that achieves the minimum distance/rating metric
+                    if (curToNext < minCurToNext) {
+                        minCurToNext = curToNext
                         targetIndex = index
                     }
                 }
-
-                // get the next location
-                val targetLocation = locationsData[targetIndex]
-
-                // add it to the updated list
-                updatedList.add(locationsData[targetIndex])
-
-                // set the current location to the location we chose to go to
-                curLocation.latitude = targetLocation.latitude
-                curLocation.longitude = targetLocation.longitude
             }
+
+            // get the next location
+            val targetLocation = locationsData[targetIndex]
+
+            // add it to the updated list
+            updatedList.add(locationsData[targetIndex])
+
+            // set the current location to the location we chose to go to
+            curLocation.latitude = targetLocation.latitude
+            curLocation.longitude = targetLocation.longitude
         }
 
         // submit list when done

@@ -61,6 +61,17 @@ class LocationFragment : Fragment() {
                     "addressFormatted is not valid for geocoder: $addressFormatted")
                 Toast.makeText(context, "The address does not exist!", Toast.LENGTH_SHORT).show()
                 validUserDataForLocation = false
+            } else {
+                // Checking for duplicates based on lat/long coordinates.
+                viewModel.observeLocations().observe(viewLifecycleOwner) {
+                    it?.forEachIndexed { index, _ ->
+                        if (it[index].latitude == addressFromGeocoder[0].latitude && it[index].longitude == addressFromGeocoder[0].longitude) {
+                            validUserDataForLocation = false
+                            Toast.makeText(context, "Location already exists!", Toast.LENGTH_SHORT).show()
+                            Log.d("LocationFragment validateUserInput()", "Location already exists!")
+                        }
+                    }
+                }
             }
         }
         // Must insert rating or ".toInt()" crashes the app
@@ -99,9 +110,10 @@ class LocationFragment : Fragment() {
 
         geocoder = Geocoder(context, Locale.getDefault())
 
+        var startingLoc = false
+
         binding.switchCompatUserLocation.setOnClickListener {
-            // TODO fix this so the Maps fragment is shown when the user clicks on a row.
-            Log.d("LocationFragment onViewCreated()", "switchCompatUserLocation clicked")
+            startingLoc = startingLoc != true
         }
 
         binding.buttonSaveLocation.setOnClickListener {
@@ -140,11 +152,13 @@ class LocationFragment : Fragment() {
                     comments = formComments,
                     rank = -1,
                     deleteFlag = false,
-                    startFlag = false
+                    startFlag = startingLoc
                 )
-                viewModel.addLocation(newLocationToAdd, geocoder)
+
+                viewModel.addLocation(newLocationToAdd, geocoder, startingLoc)
                 // Clear the edit text fields.
                 clearForm()
+                startingLoc = false
             }
 
 
