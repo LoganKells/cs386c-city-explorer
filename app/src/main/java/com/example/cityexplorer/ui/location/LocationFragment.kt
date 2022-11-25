@@ -62,13 +62,19 @@ class LocationFragment : Fragment() {
                 Toast.makeText(context, "The address does not exist!", Toast.LENGTH_SHORT).show()
                 validUserDataForLocation = false
             } else {
-                // Checking for duplicates based on lat/long coordinates.
-                viewModel.observeLocations().observe(viewLifecycleOwner) {
-                    it?.forEachIndexed { index, _ ->
-                        if (it[index].latitude == addressFromGeocoder[0].latitude && it[index].longitude == addressFromGeocoder[0].longitude) {
+                val currentLocations: List<Location>? = viewModel.getLocations()
+
+                // Check if the address is already in the list of locations.
+                if (currentLocations != null) {
+                    for ((idx, location) in currentLocations.withIndex()) {
+                        if (currentLocations[idx].latitude == addressFromGeocoder[0].latitude
+                            && currentLocations[idx].longitude == addressFromGeocoder[0].longitude) {
+                            Toast.makeText(context, "The address is already in the list!",
+                                Toast.LENGTH_SHORT).show()
+                            Log.d("LocationFragment validateUserInput()",
+                                "Address is already in the list: $addressFormatted")
                             validUserDataForLocation = false
-                            Toast.makeText(context, "Location already exists!", Toast.LENGTH_SHORT).show()
-                            Log.d("LocationFragment validateUserInput()", "Location already exists!")
+                            break
                         }
                     }
                 }
