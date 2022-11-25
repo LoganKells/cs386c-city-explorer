@@ -53,6 +53,11 @@ class LocationAdapter(private val viewModel: MainViewModel)
                 viewModel.updateLocation(locationInAdapter, position)
                 Log.d("LocationAdapter", "onBindViewHolder: isChecked = $isChecked")
             }
+
+            // Go to the maps screen when the user clicks on the row.
+            holder.rowBinding.root.setOnClickListener {
+                viewModel.onLocationClicked(locationInAdapter)
+            }
         }
     }
 

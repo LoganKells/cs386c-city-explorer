@@ -1,5 +1,6 @@
 package com.example.cityexplorer.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.cityexplorer.R
 import com.example.cityexplorer.databinding.ActivityMainBinding
+import com.example.cityexplorer.ui.maps.MapsActivity
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -49,6 +51,23 @@ class MainActivity : AppCompatActivity() {
         viewModel.refreshLocationsFromJson()
     }
 
+    private fun initObserverActions() {
+        // Launch the MapsActivity to show the selected location.
+        viewModel.observeSelectedLocation().observe(this) { location ->
+            if (location != null) {
+
+                val mapActivityIntent = Intent(this, MapsActivity::class.java)
+
+                // Pass the location data to the MapsActivity.
+                mapActivityIntent.putExtra("EXTRA_LOCATION_LATITUDE", location.latitude)
+                mapActivityIntent.putExtra("EXTRA_LOCATION_LONGITUDE", location.longitude)
+                mapActivityIntent.putExtra("EXTRA_LOCATION_NICKNAME", location.nickname)
+
+                startActivity(mapActivityIntent)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -58,6 +77,9 @@ class MainActivity : AppCompatActivity() {
 
         // Load the location data from the persistent JSON file into the model.
         initData()
+
+        // Initialize model observers, which will be used to update the UI.
+        initObserverActions()
 
         // We are using a navigation graph to manage the navigation between fragments.
         val navController = findNavController(R.id.nav_host_fragment_content_main)
