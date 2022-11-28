@@ -196,28 +196,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
     /**
-     * Function to remove locations selected by the user in the RecyclerView.
+     * Function to update all locations selected by the user in the RecyclerView.
      * */
-    fun removeSelectedLocations() {
-        val locationsData: MutableList<Location>? = getLocations() as MutableList<Location>?
-        if (locationsData != null) {
-            var deletedLocations = 0
-
-            // Remove all selected Locations from the list if they are not a starting location.
-            locationsData.removeAll { location ->
-                if (location.deleteFlag && !location.startFlag) {
-                    deletedLocations++
-                    true
-                } else {
-                    false
-                }
-            }
-        }
+    fun updateAllLocations(newLocations: List<Location>) {
         // update model
-        locations.postValue(locationsData)
+        locations.postValue(newLocations)
 
         // Sync JSON file to model
-        saveLocationsToJson(locationsData!!)
+        saveLocationsToJson(newLocations!!)
     }
 
     /**
