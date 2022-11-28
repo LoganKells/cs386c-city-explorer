@@ -46,12 +46,15 @@ class LocationAdapter(private val viewModel: MainViewModel)
 
             // Update the deleteFlag in the Location object when the checkbox is clicked in the
             // view model.
-            holder.rowBinding.rowCheckBoxDelete.setOnCheckedChangeListener { _, isChecked: Boolean ->
-                locationInAdapter.deleteFlag = isChecked
 
-                // It's critical to update the model to reflect the user's changes.
+            holder.rowBinding.rowCheckBoxDelete.setOnClickListener {
+                locationInAdapter.deleteFlag = locationInAdapter.deleteFlag != true
                 viewModel.updateLocation(locationInAdapter, position)
-                Log.d("LocationAdapter", "onBindViewHolder: isChecked = $isChecked")
+            }
+
+            // Go to the maps screen when the user clicks on the row.
+            holder.rowBinding.root.setOnClickListener {
+                viewModel.onLocationClicked(locationInAdapter)
             }
         }
     }

@@ -6,17 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".ui.location.LocationFragment">
 
-    <TextView
-        android:id="@+id/textViewLocationForm"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineForEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Location Form"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textViewNickname"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="spread_inside" />
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.36" />
 
     <TextView
         android:id="@+id/textViewNickname"
@@ -27,7 +22,7 @@
         app:layout_constraintBottom_toTopOf="@+id/textViewAddressLine1"
         app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLocationForm" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editTextNickname"
@@ -40,7 +35,6 @@
         app:layout_constraintBaseline_toBaselineOf="@+id/textViewNickname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guidelineForEditText" />
-
 
     <TextView
         android:id="@+id/textViewAddressLine1"
@@ -72,7 +66,7 @@
         android:layout_height="wrap_content"
         android:gravity="right"
         android:text="Address Line 2"
-        app:layout_constraintBottom_toTopOf="@+id/textView3"
+        app:layout_constraintBottom_toTopOf="@+id/textViewCity"
         app:layout_constraintTop_toBottomOf="@+id/textViewAddressLine1"
         app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -90,12 +84,12 @@
         app:layout_constraintStart_toStartOf="@+id/guidelineForEditText" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/textViewCity"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="right"
         android:text="City"
-        app:layout_constraintBottom_toTopOf="@+id/textViewState"
+        app:layout_constraintBottom_toTopOf="@+id/textViewPostalCode"
         app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewAddressLine2" />
@@ -108,39 +102,9 @@
         android:layout_marginStart="16dp"
         android:hint="City"
         android:textSize="14sp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/textView3"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textViewCity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guidelineForEditText" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineForEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.36" />
-
-    <TextView
-        android:id="@+id/textViewState"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:text="State"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/textViewPostalCode"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <Spinner
-        android:id="@+id/spinnerStateSelection"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/editTextZipCode"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guidelineForEditText"
-        app:layout_constraintTop_toBottomOf="@+id/editTextCity" />
 
     <TextView
         android:id="@+id/textViewPostalCode"
@@ -150,10 +114,9 @@
         android:text="Zip/Postal Code"
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/textViewCountry"
-        app:layout_constraintTop_toBottomOf="@+id/textViewState"
+        app:layout_constraintTop_toBottomOf="@+id/textViewCity"
         app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textViewCountry"
@@ -165,8 +128,7 @@
         app:layout_constraintBottom_toTopOf="@+id/textViewRating"
         app:layout_constraintTop_toBottomOf="@+id/textViewPostalCode"
         app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteX="-3dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textViewCountryValue"
@@ -191,8 +153,7 @@
         app:layout_constraintBottom_toTopOf="@+id/textViewLengthOfStay"
         app:layout_constraintTop_toBottomOf="@+id/textViewCountry"
         app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteX="3dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/editTextRating"
@@ -209,16 +170,15 @@
 
     <TextView
         android:id="@+id/textViewLengthOfStay"
-        android:layout_width="136dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="right"
         android:text="Length of Stay"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/switchCompatUserLocation"
+        app:layout_constraintBottom_toTopOf="@+id/textViewComments"
         app:layout_constraintTop_toBottomOf="@+id/textViewRating"
         app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteX="-6dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/editTextDurationAtLocation"
@@ -229,6 +189,30 @@
         android:hint="Enter minutes"
         android:textSize="14sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/textViewLengthOfStay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guidelineForEditText" />
+
+    <TextView
+        android:id="@+id/textViewComments"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:textSize="14sp"
+        android:text="Comments"
+        app:layout_constraintBottom_toTopOf="@+id/switchCompatUserLocation"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLengthOfStay"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineForEditText"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/editTextComments"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:hint="Enter comments"
+        android:textSize="14sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textViewComments"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guidelineForEditText" />
 
@@ -270,6 +254,6 @@
         android:text="My Starting Location"
         app:layout_constraintBottom_toTopOf="@+id/buttonSaveLocation"
         app:layout_constraintStart_toStartOf="@+id/guidelineForEditText"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLengthOfStay" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewComments" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

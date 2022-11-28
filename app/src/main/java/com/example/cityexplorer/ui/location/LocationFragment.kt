@@ -62,13 +62,19 @@ class LocationFragment : Fragment() {
                 Toast.makeText(context, "The address does not exist!", Toast.LENGTH_SHORT).show()
                 validUserDataForLocation = false
             } else {
-                // Checking for duplicates based on lat/long coordinates.
-                viewModel.observeLocations().observe(viewLifecycleOwner) {
-                    it?.forEachIndexed { index, _ ->
-                        if (it[index].latitude == addressFromGeocoder[0].latitude && it[index].longitude == addressFromGeocoder[0].longitude) {
+                val currentLocations: List<Location>? = viewModel.getLocations()
+
+                // Check if the address is already in the list of locations.
+                if (currentLocations != null) {
+                    for ((idx, location) in currentLocations.withIndex()) {
+                        if (currentLocations[idx].latitude == addressFromGeocoder[0].latitude
+                            && currentLocations[idx].longitude == addressFromGeocoder[0].longitude) {
+                            Toast.makeText(context, "The address is already in the list!",
+                                Toast.LENGTH_SHORT).show()
+                            Log.d("LocationFragment validateUserInput()",
+                                "Address is already in the list: $addressFormatted")
                             validUserDataForLocation = false
-                            Toast.makeText(context, "Location already exists!", Toast.LENGTH_SHORT).show()
-                            Log.d("LocationFragment validateUserInput()", "Location already exists!")
+                            break
                         }
                     }
                 }
@@ -101,6 +107,7 @@ class LocationFragment : Fragment() {
         binding.editTextZipCode.text.clear()
         binding.editTextRating.text.clear()
         binding.editTextDurationAtLocation.text.clear()
+        binding.editTextComments.text.clear()
         binding.switchCompatUserLocation.isChecked = false
     }
 
@@ -118,17 +125,13 @@ class LocationFragment : Fragment() {
 
         binding.buttonSaveLocation.setOnClickListener {
             val formNickName = binding.editTextNickname.text.toString()
-            val country = "United States"
             val formCity = binding.editTextCity.text.toString()
-            // TODO - get the state from the spinner, which is not in the UI yet.
-            val formState = "CA"
             val formAddress1 = binding.editTextAddressLine1.text.toString()
             val formAddress2 = binding.editTextAddressLine2.text.toString()
             val formPostCode = binding.editTextZipCode.text.toString()
             val formRating = binding.editTextRating.text.toString()
             val formDuration = binding.editTextDurationAtLocation.text.toString()
-            // TODO - Add comments field to UI. we said we would have comments in the proposal.
-            val formComments = ""
+            val formComments = binding.editTextComments.text.toString()
 
             // Validate user input as an address with rating and duration.
             val addressFormatted = "$formAddress1 $formAddress2, $formCity, $formPostCode"
@@ -160,8 +163,6 @@ class LocationFragment : Fragment() {
                 clearForm()
                 startingLoc = false
             }
-
-
         }
 
         binding.buttonMainMenu.setOnClickListener {

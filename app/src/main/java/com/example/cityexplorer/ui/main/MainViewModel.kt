@@ -16,9 +16,6 @@ import kotlinx.coroutines.launch
 import java.io.InputStream
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
-    // The title value is observed to update the action bar title.
-    private var title = MutableLiveData<String>()
-
     // The LocationReposity is the bridge between API and the application.
     private val locationJsonApi = LocationJsonApi.create()
     private val locationRepository = LocationRepository(locationJsonApi)
@@ -26,17 +23,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Locations are observed in the MainFragment to display them in the RecyclerView.
     private val locations = MutableLiveData<List<Location>?>()
 
-    // ************** Action Bar ************************
-    fun setTitle(newTitle: String) {
-        title.value = newTitle
+    // ************** Selected Location ************************
+    // The selected location is observed in the MainFragment to display it in the MapsActivity.kt
+    private var selectedLocation = MutableLiveData<Location?>()
+
+    private fun setSelectedLocation(location: Location) {
+        selectedLocation.value = location
     }
+
+    fun onLocationClicked(location: Location) {
+        setSelectedLocation(location)
+    }
+
+    fun observeSelectedLocation(): MutableLiveData<Location?> {
+        return selectedLocation
+    }
+
 
     // ************** Locations ************************
     fun observeLocations(): MutableLiveData<List<Location>?> {
         return locations
     }
 
-    private fun getLocations(): List<Location>? {
+    fun getLocations(): List<Location>? {
         return locations.value
     }
 
@@ -72,8 +81,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             // Overwrite starting location if the starting location box was checked
             if (startLocFlag) {
                 if (newLocations != null) {
-                    for ((index, location) in newLocations.withIndex()) {
-                        newLocations[index].startFlag = false
+                    for (locationCurrent in newLocations) {
+                        locationCurrent.startFlag = false
                     }
                 }
             }
@@ -187,28 +196,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
     /**
-     * Function to remove locations selected by the user in the RecyclerView.
+     * Function to update all locations selected by the user in the RecyclerView.
      * */
-    fun removeSelectedLocations() {
-        val locationsData: MutableList<Location>? = getLocations() as MutableList<Location>?
-        if (locationsData != null) {
-            var deletedLocations = 0
-
-            // Remove all selected Locations from the list if they are not a starting location.
-            locationsData.removeAll { location ->
-                if (location.deleteFlag && !location.startFlag) {
-                    deletedLocations++
-                    true
-                } else {
-                    false
-                }
-            }
-        }
+    fun updateAllLocations(newLocations: List<Location>) {
         // update model
-        locations.postValue(locationsData)
+        locations.postValue(newLocations)
 
         // Sync JSON file to model
-        saveLocationsToJson(locationsData!!)
+        saveLocationsToJson(newLocations!!)
     }
 
     /**
@@ -244,29 +239,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         // However, Kotlin may still regard "Location" as the import!
         // Thus, we need to be careful whenever we make use of "Location".
 
-        // The final updated list. We will build it.
         val updatedList = mutableListOf<Location>()
-
-        // Initialize variables
-        val curLocation = android.location.Location("")
-        val nextLocation = android.location.Location("")
+        val firstLocation = android.location.Location("")
+        val secondLocation = android.location.Location("")
         var curToNext: Float
 
         // Find starting location and get coordinates
         var foundStartingLoc = false
         if (locationsData != null) {
-            for ((index, location) in locationsData.withIndex()) {
-                if (locationsData[index].startFlag) {
-                    curLocation.latitude = locationsData[index].latitude
-                    curLocation.longitude = locationsData[index].longitude
-                    updatedList.add(locationsData[index])
+            for (locationCurrent in locationsData) {
+                if (locationCurrent.startFlag) {
+                    firstLocation.latitude = locationCurrent.latitude
+                    firstLocation.longitude = locationCurrent.longitude
+                    updatedList.add(locationCurrent)
                     foundStartingLoc = true
                 }
             }
 
             if (!foundStartingLoc) {
-                curLocation.latitude = locationsData[0].latitude
-                curLocation.longitude = locationsData[0].longitude
+                firstLocation.latitude = locationsData[0].latitude
+                firstLocation.longitude = locationsData[0].longitude
                 updatedList.add(locationsData[0])
             }
         }
@@ -279,17 +271,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             var targetIndex = -1
 
             // parse the entire list of locations
-            for ((index, location) in locationsData.withIndex()) {
+            for ((index, locationCurrent) in locationsData.withIndex()) {
                 // check to skip the current location, as it cannot be the next one
                 // if (location.latitude != curLocation.latitude && location.longitude != curLocation.longitude) {
-                if (!updatedList.contains(locationsData[index])) {
+                if (!updatedList.contains(locationCurrent)) {
 
                     // get coordinates of the candidate next location
-                    nextLocation.latitude = locationsData[index].latitude
-                    nextLocation.longitude = locationsData[index].longitude
+                    secondLocation.latitude = locationCurrent.latitude
+                    secondLocation.longitude = locationCurrent.longitude
 
                     // calculate distance/rating metric between current location and candidate next location
-                    curToNext = (curLocation.distanceTo(nextLocation) * (1 - 0.1 * locationsData[index].rating)).toFloat()
+                    curToNext = (firstLocation.distanceTo(secondLocation)
+                            * (1 - 0.1 * locationCurrent.rating)).toFloat()
 
                     // keep the location index that achieves the minimum distance/rating metric
                     if (curToNext < minCurToNext) {
@@ -306,8 +299,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             updatedList.add(locationsData[targetIndex])
 
             // set the current location to the location we chose to go to
-            curLocation.latitude = targetLocation.latitude
-            curLocation.longitude = targetLocation.longitude
+            firstLocation.latitude = targetLocation.latitude
+            firstLocation.longitude = targetLocation.longitude
         }
 
         // submit list when done

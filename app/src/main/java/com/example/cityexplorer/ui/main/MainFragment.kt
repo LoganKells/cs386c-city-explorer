@@ -110,7 +110,18 @@ class MainFragment : Fragment() {
         // Finally, we display a Toast message in case we attempt to delete a starting location
         // and cancel the operation for that specific item (other selected items will be deleted).
         binding.buttonDeleteSelectedLocations.setOnClickListener {
-            viewModel.removeSelectedLocations()
+            val newLocations = locationAdapter.currentList.toMutableList()
+            viewModel.observeLocations().observe(viewLifecycleOwner) {
+                it?.forEachIndexed { index, location ->
+                    if (location.deleteFlag && !location.startFlag) {
+                        newLocations.remove(location)
+                    }
+                }
+            }
+            viewModel.updateAllLocations(newLocations)
+            locationAdapter.submitList(newLocations)
+            findNavController().navigate(R.id.action_MainFragment_to_LocationFragment)
+            findNavController().navigate(R.id.action_LocationFragment_to_MainFragment)
         }
 
         // This button will navigate to the LocationFragment for adding new locations.
