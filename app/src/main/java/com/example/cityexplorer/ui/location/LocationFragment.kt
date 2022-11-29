@@ -81,13 +81,13 @@ class LocationFragment : Fragment() {
             }
         }
         // Must insert rating or ".toInt()" crashes the app
-        if (formRating.isEmpty()) {
+        if (formRating.isEmpty() || formRating.toInt() < 0 || formRating.toInt() > 5) {
             Log.d("LocationFragment validateUserInput()", "formRating is empty")
             Toast.makeText(context, "Please provide a valid rating!", Toast.LENGTH_SHORT).show()
             validUserDataForLocation = false
         }
         // Must insert duration or ".toInt()" crashes the app
-        if (formDuration.isEmpty()) {
+        if (formDuration.isEmpty() || formDuration.toInt() <= 0) {
             Log.d("LocationFragment validateUserInput()", "formDuration is empty")
             Toast.makeText(context, "Please provide a valid duration!", Toast.LENGTH_SHORT).show()
             validUserDataForLocation = false

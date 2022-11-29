@@ -125,8 +125,6 @@ class MainFragment : Fragment() {
             }
             viewModel.updateAllLocations(newLocations)
             locationAdapter.submitList(newLocations)
-            findNavController().navigate(R.id.action_MainFragment_to_LocationFragment)
-            findNavController().navigate(R.id.action_LocationFragment_to_MainFragment)
         }
 
         // This button will navigate to the LocationFragment for adding new locations.
@@ -136,7 +134,13 @@ class MainFragment : Fragment() {
 
         // This button will optimize the sort of the List<Location> in the model.
         binding.fabOptimize.setOnClickListener {
-            viewModel.calculateOrderOfLocations()
+            val totalTimeAvailable = binding.editText.text.toString()
+            if (totalTimeAvailable.isNotEmpty() && totalTimeAvailable.toInt() > 0) {
+                viewModel.calculateOrderOfLocations(totalTimeAvailable.toInt())
+            }
+            else {
+                Toast.makeText(context, "Provide a valid available time value!", Toast.LENGTH_LONG).show()
+            }
         }
 
         // This button will export the data to a JSON file.
