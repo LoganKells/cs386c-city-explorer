@@ -196,28 +196,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
     /**
-     * Function to remove locations selected by the user in the RecyclerView.
+     * Function to update all locations selected by the user in the RecyclerView.
      * */
-    fun removeSelectedLocations() {
-        val locationsData: MutableList<Location>? = getLocations() as MutableList<Location>?
-        if (locationsData != null) {
-            var deletedLocations = 0
-
-            // Remove all selected Locations from the list if they are not a starting location.
-            locationsData.removeAll { location ->
-                if (location.deleteFlag && !location.startFlag) {
-                    deletedLocations++
-                    true
-                } else {
-                    false
-                }
-            }
-        }
+    fun updateAllLocations(newLocations: List<Location>) {
         // update model
-        locations.postValue(locationsData)
+        locations.postValue(newLocations)
 
         // Sync JSON file to model
-        saveLocationsToJson(locationsData!!)
+        saveLocationsToJson(newLocations!!)
     }
 
     /**
@@ -244,7 +230,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * The "Algorithm" for optimizing the sorting of the locations
      * */
-    fun calculateOrderOfLocations() {
+    fun calculateOrderOfLocations(totalTimeAvailable: Int) {
+
+        var totalTimeLeft = totalTimeAvailable
+
         val locationsData = getLocations()
         // Updated list variable
         // Careful: We have a "Location" data class... but also...
@@ -278,9 +267,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         // While the updated list is not yet completely filled
-        while (updatedList.size < locationsData?.size!!) {
+        while (updatedList.size < locationsData?.size!! && totalTimeLeft > 0) {
 
             // initialize variables
+            var timeToNext = -1
             var minCurToNext = 100000000000000F
             var targetIndex = -1
 
@@ -295,15 +285,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     secondLocation.longitude = locationCurrent.longitude
 
                     // calculate distance/rating metric between current location and candidate next location
-                    curToNext = (firstLocation.distanceTo(secondLocation)
+                    curToNext = ((firstLocation.distanceTo(secondLocation) / 1000)
                             * (1 - 0.1 * locationCurrent.rating)).toFloat()
 
                     // keep the location index that achieves the minimum distance/rating metric
                     if (curToNext < minCurToNext) {
                         minCurToNext = curToNext
                         targetIndex = index
+                        timeToNext = ((firstLocation.distanceTo(secondLocation) / 1000) / 0.75 + locationCurrent.duration).toInt()
                     }
                 }
+            }
+
+            // subtract time
+            totalTimeLeft -= timeToNext
+
+            // out of time - stop adding new places and display the result
+            if (totalTimeLeft <= 0) {
+                break
             }
 
             // get the next location

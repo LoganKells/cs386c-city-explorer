@@ -110,7 +110,21 @@ class MainFragment : Fragment() {
         // Finally, we display a Toast message in case we attempt to delete a starting location
         // and cancel the operation for that specific item (other selected items will be deleted).
         binding.buttonDeleteSelectedLocations.setOnClickListener {
-            viewModel.removeSelectedLocations()
+            val newLocations = locationAdapter.currentList.toMutableList()
+            viewModel.observeLocations().observe(viewLifecycleOwner) {
+                it?.forEachIndexed { index, location ->
+                    if (location.deleteFlag) {
+                        if (!location.startFlag) {
+                            newLocations.remove(location)
+                        }
+                        else {
+                            Toast.makeText(context, "Cannot delete starting location!", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+            viewModel.updateAllLocations(newLocations)
+            locationAdapter.submitList(newLocations)
         }
 
         // This button will navigate to the LocationFragment for adding new locations.
@@ -120,7 +134,13 @@ class MainFragment : Fragment() {
 
         // This button will optimize the sort of the List<Location> in the model.
         binding.fabOptimize.setOnClickListener {
-            viewModel.calculateOrderOfLocations()
+            val totalTimeAvailable = binding.editText.text.toString()
+            if (totalTimeAvailable.isNotEmpty() && totalTimeAvailable.toInt() > 0) {
+                viewModel.calculateOrderOfLocations(totalTimeAvailable.toInt())
+            }
+            else {
+                Toast.makeText(context, "Provide a valid available time value!", Toast.LENGTH_LONG).show()
+            }
         }
 
         // This button will export the data to a JSON file.
