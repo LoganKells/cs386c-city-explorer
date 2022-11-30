@@ -26,7 +26,7 @@ class LocationRepository(private val locationJsonApi: LocationJsonApi) {
 
         // Encode the location to a android.location.Address
         val addressesFromGeocoder: MutableList<Address> = geocoder.getFromLocationName(location.address1, 1)
-        val addressRetrieved: Address? = addressesFromGeocoder[0]
+        val addressRetrieved: Address ?= addressesFromGeocoder[0]
         if (addressRetrieved != null) {
             // val completeAddress = addressRetrieved.getAddressLine(0)
             location.latitude = addressRetrieved.latitude
@@ -39,7 +39,14 @@ class LocationRepository(private val locationJsonApi: LocationJsonApi) {
             if (addressRetrieved.subThoroughfare != addressRetrieved.featureName) {
                 location.address2 = addressRetrieved.featureName ?: ""
             }
-            location.postCode = addressRetrieved.postalCode
+
+            if (addressRetrieved.postalCode == null) {
+                location.postCode = ""
+            }
+            else {
+                location.postCode = addressRetrieved.postalCode
+            }
+
             location.city = addressRetrieved.locality
             location.state = addressRetrieved.adminArea
             location.country = addressRetrieved.countryCode
