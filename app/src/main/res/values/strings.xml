@@ -10,4 +10,8 @@
 
     <string name="hello_first_fragment">Hello main fragment</string>
     <string name="hello_second_fragment">Hello location fragment. Arg: %1$s</string>
+    <string name="row_start_location_symbol">!</string>
+    <string name="row_text_view_name">Name</string>
+    <string name="row_text_view_rating">1</string>
+    <string name="row_text_view_address">Address1\nAddress2</string>
 </resources>
