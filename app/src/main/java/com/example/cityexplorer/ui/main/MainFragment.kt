@@ -135,8 +135,8 @@ class MainFragment : Fragment() {
         // This button will optimize the sort of the List<Location> in the model.
         binding.fabOptimize.setOnClickListener {
             val totalTimeAvailable = binding.editText.text.toString()
-            if (totalTimeAvailable.isNotEmpty() && totalTimeAvailable.toInt() > 0) {
-                viewModel.calculateOrderOfLocations(totalTimeAvailable.toInt())
+            if (totalTimeAvailable.isNotEmpty() && totalTimeAvailable.toFloat() > 0) {
+                viewModel.calculateOrderOfLocations(totalTimeAvailable.toFloat())
             }
             else {
                 Toast.makeText(context, "Provide a valid available time value!", Toast.LENGTH_LONG).show()

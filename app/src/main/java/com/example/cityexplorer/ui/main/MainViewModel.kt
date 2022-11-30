@@ -230,7 +230,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * The "Algorithm" for optimizing the sorting of the locations
      * */
-    fun calculateOrderOfLocations(totalTimeAvailable: Int) {
+    fun calculateOrderOfLocations(totalTimeAvailable: Float) {
 
         var totalTimeLeft = totalTimeAvailable
 
@@ -270,7 +270,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         while (updatedList.size < locationsData?.size!! && totalTimeLeft > 0) {
 
             // initialize variables
-            var timeToNext = -1
+            var timeToNext = -1F
             var minCurToNext = 100000000000000F
             var targetIndex = -1
 
@@ -292,7 +292,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     if (curToNext < minCurToNext) {
                         minCurToNext = curToNext
                         targetIndex = index
-                        timeToNext = ((firstLocation.distanceTo(secondLocation) / 1000) / 0.75 + locationCurrent.duration).toInt()
+                        timeToNext = ((firstLocation.distanceTo(secondLocation) / 1000) / 0.75 + locationCurrent.duration).toFloat()
                     }
                 }
             }

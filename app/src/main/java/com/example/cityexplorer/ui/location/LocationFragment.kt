@@ -80,14 +80,14 @@ class LocationFragment : Fragment() {
                 }
             }
         }
-        // Must insert rating or ".toInt()" crashes the app
-        if (formRating.isEmpty() || formRating.toInt() < 0 || formRating.toInt() > 5) {
+        // Must insert rating or ".toFloat()" crashes the app
+        if (formRating.isEmpty() || formRating.toFloat() < 0 || formRating.toFloat() > 5) {
             Log.d("LocationFragment validateUserInput()", "formRating is empty")
             Toast.makeText(context, "Please provide a valid rating!", Toast.LENGTH_SHORT).show()
             validUserDataForLocation = false
         }
-        // Must insert duration or ".toInt()" crashes the app
-        if (formDuration.isEmpty() || formDuration.toInt() <= 0) {
+        // Must insert duration or ".toFloat()" crashes the app
+        if (formDuration.isEmpty() || formDuration.toFloat() <= 0) {
             Log.d("LocationFragment validateUserInput()", "formDuration is empty")
             Toast.makeText(context, "Please provide a valid duration!", Toast.LENGTH_SHORT).show()
             validUserDataForLocation = false
@@ -150,8 +150,8 @@ class LocationFragment : Fragment() {
                     postCode = "",
                     latitude = 0.0,
                     longitude = 0.0,
-                    rating = formRating.toInt(),
-                    duration = formDuration.toInt(),
+                    rating = formRating.toFloat(),
+                    duration = formDuration.toFloat(),
                     comments = formComments,
                     rank = -1,
                     deleteFlag = false,
