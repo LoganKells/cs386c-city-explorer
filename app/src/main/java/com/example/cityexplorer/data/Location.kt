@@ -19,9 +19,6 @@ data class Location(
     ) {
 
     override fun equals(other: Any?): Boolean {
-        // TODO - what if Latitude and Longitude are not populated?
-        // FIXME - Why can we add multiple locations with the same values when we load ViewModel
-        //  from JSON file?
         return if (other is Location) {
             latitude == other.latitude && longitude == other.longitude
         } else {
