@@ -1,8 +1,8 @@
 {
   "locations": [
     {
-      "address1": " Golden Gate Bridge",
-      "address2": "Golden Gate Bridge",
+      "address1": "Golden Gate Bridge",
+      "address2": "",
       "city": "San Francisco",
       "comments": "",
       "country": "US",
@@ -18,7 +18,7 @@
       "state": "California"
     },
     {
-      "address1": " ",
+      "address1": "Alcatraz Island",
       "address2": "San Francisco",
       "city": "San Francisco",
       "comments": "",
@@ -35,8 +35,8 @@
       "state": "California"
     },
     {
-      "address1": " Pier 39",
-      "address2": "Pier 39",
+      "address1": "Pier 39",
+      "address2": "",
       "city": "San Francisco",
       "comments": "",
       "country": "US",
@@ -69,8 +69,8 @@
       "state": "California"
     },
     {
-      "address1": " ",
-      "address2": "Union Square",
+      "address1": "Union Square",
+      "address2": "",
       "city": "San Francisco",
       "comments": "",
       "country": "US",
@@ -103,8 +103,8 @@
       "state": "California"
     },
     {
-      "address1": " ",
-      "address2": "Statue of Liberty",
+      "address1": "Statue of Liberty",
+      "address2": "",
       "city": "New York",
       "comments": "",
       "country": "US",
@@ -118,6 +118,23 @@
       "rating": 5.0,
       "startFlag": false,
       "state": "New York"
+    },
+    {
+      "address1": "563 Ruger Street",
+      "address2": "",
+      "city": "San Francisco",
+      "comments": "entertainment",
+      "country": "US",
+      "deleteFlag": false,
+      "duration": 120.0,
+      "latitude": 37.797381099999996,
+      "longitude": -122.448471,
+      "nickname": "Presidio Social Club",
+      "postCode": "94129",
+      "rank": -1,
+      "rating": 1.0,
+      "startFlag": false,
+      "state": "California"
     }
   ]
 }
