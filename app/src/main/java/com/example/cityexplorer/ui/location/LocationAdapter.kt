@@ -1,6 +1,5 @@
 package com.example.cityexplorer.ui.location
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,12 +44,10 @@ class LocationAdapter(private val viewModel: MainViewModel)
             // Ensure the checkbox is set to the correct value.
             holder.rowBinding.rowCheckBoxDelete.isChecked = locationInAdapter.deleteFlag
 
-            // Highlight the row of the starting location.
+            // Highlight the row of the starting location with a symbol.
             if (locationInAdapter.startFlag) {
-                holder.rowBinding.rowCardView.setCardBackgroundColor(Color.RED)
                 holder.rowBinding.rowTextViewStartLocation.visibility = View.VISIBLE
             } else {
-                // holder.rowBinding.rowLayout.setBackgroundColor(Color.TRANSPARENT)
                 holder.rowBinding.rowTextViewStartLocation.visibility = View.INVISIBLE
             }
 
