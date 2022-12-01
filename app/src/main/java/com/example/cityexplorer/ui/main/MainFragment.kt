@@ -15,6 +15,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cityexplorer.R
+import com.example.cityexplorer.data.Location
 import com.example.cityexplorer.databinding.FragmentMainBinding
 import com.example.cityexplorer.ui.location.LocationAdapter
 
@@ -70,6 +71,10 @@ class MainFragment : Fragment() {
                         viewModel.exportToJson(uri)
                     }
                 Log.d("MainFragment", "Created ActivityResultLauncher for saving JSON file.")
+            } else {
+                val errorMessage = "Failed to save JSON file."
+                Log.d("MainFragment", errorMessage)
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
         }
 
@@ -82,8 +87,9 @@ class MainFragment : Fragment() {
                 }
                 Log.d("MainFragment", "Created ActivityResultLauncher for opening JSON file.")
             } else {
-                Log.d("MainFragment", "Failed to open JSON file.")
-                Toast.makeText(context, "Failed to open JSON file.", Toast.LENGTH_LONG).show()
+                val errorMessage = "Failed to open JSON file."
+                Log.d("MainFragment", errorMessage)
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
         }
 
@@ -111,15 +117,15 @@ class MainFragment : Fragment() {
         // and cancel the operation for that specific item (other selected items will be deleted).
         binding.buttonDeleteSelectedLocations.setOnClickListener {
             val newLocations = locationAdapter.currentList.toMutableList()
-            viewModel.observeLocations().observe(viewLifecycleOwner) {
-                it?.forEachIndexed { index, location ->
-                    if (location.deleteFlag) {
-                        if (!location.startFlag) {
-                            newLocations.remove(location)
-                        }
-                        else {
-                            Toast.makeText(context, "Cannot delete starting location!", Toast.LENGTH_LONG).show()
-                        }
+            val modelLocations: List<Location>? = viewModel.getLocations()
+            if (modelLocations != null) {
+                for (loc in modelLocations) {
+                    if (loc.deleteFlag && !loc.startFlag) {
+                        newLocations.remove(loc)
+                    } else if (loc.deleteFlag && loc.startFlag) {
+                        val errorMessage = "Cannot delete starting location!"
+                        Log.d("MainFragment", errorMessage)
+                        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                     }
                 }
             }

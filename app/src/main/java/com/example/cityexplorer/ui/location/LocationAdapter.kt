@@ -1,7 +1,7 @@
 package com.example.cityexplorer.ui.location
 
-import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -43,6 +43,13 @@ class LocationAdapter(private val viewModel: MainViewModel)
 
             // Ensure the checkbox is set to the correct value.
             holder.rowBinding.rowCheckBoxDelete.isChecked = locationInAdapter.deleteFlag
+
+            // Highlight the row of the starting location with a symbol.
+            if (locationInAdapter.startFlag) {
+                holder.rowBinding.rowTextViewStartLocation.visibility = View.VISIBLE
+            } else {
+                holder.rowBinding.rowTextViewStartLocation.visibility = View.INVISIBLE
+            }
 
             // Update the deleteFlag in the Location object when the checkbox is clicked in the
             // view model.
