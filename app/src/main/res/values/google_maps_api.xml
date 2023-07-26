@@ -8,6 +8,6 @@
      the Google Maps API.
    -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
-        AIzaSyCO4I_-UO8rK-eGi-9nzX4C8paWLcCC7ig
+        enter-api-key-here
     </string>
 </resources>
